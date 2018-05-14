@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        td, th {
+            min-width: 150px;
+        }
+        th {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<table id="grid">
+    <thead>
+    <tr>
+        <th data-type="string">Ім'я</th>
+        <th data-type="number">Вік</th>
+        <th data-type="date">Дата</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Володимир</td>
+        <td>27</td>
+        <td>1991-09-16</td>
+    </tr>
+    <tr>
+        <td>Олександра</td>
+        <td>16</td>
+        <td>2002-02-29</td>
+    </tr>
+    <tr>
+        <td>Марина</td>
+        <td>45</td>
+        <td>1973-04-02</td>
+    </tr>
+    <tr>
+        <td>Андрій</td>
+        <td>10</td>
+        <td>2009-06-17</td>
+    </tr>
+    <tr>
+        <td>Ганна</td>
+        <td>33</td>
+        <td>1985-09-14</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+<script>
+    let grid = document.getElementById('grid');
+    let tbody = grid.getElementsByTagName('tbody')[0];
+    let array= [].slice.call(tbody.rows);  // масив для змін
+//  let mas= makeClone(array); // копіюємо через глибоке копіювання, масив для початкового значення таблиці
+    let mas= [].slice.call(tbody.rows);
+    let n=0,s=0,d=0;  // кіл-сть кліків на кожен стовбець
+
+    grid.onclick = function(e) {
+        if (e.target.tagName !== 'TH') return;
+        let ind = e.target.cellIndex;  // номер індексу стовбця
+        let t = e.target.getAttribute('data-type');  // тип стовбця
+        switch (t)
+        {
+            // якщо кіл кліків перевищила 2, то присвоєюмо 0 для відображення початкового значення таблиці
+            case 'string': {s++; if(s>2) s=0;           sortGrid(ind, array, mas,grid,tbody, s); break; }
+            case  'number': {n++; y=true; if(n>2) n=0;  sortGrid(ind, array, mas,grid,tbody, n); break; }
+            case  'date':{d++; if(d>2) d=0;             sortGrid(ind, array, mas,grid,tbody, d); break; }
+        }
+    };
+
+    function sortGrid(colNum, rowsArray, arr, gr,tb, k) {
+        let num=[];
+        for( let i = 0; i < rowsArray.length; i++){
+            //  якщо це стовбець з віком, то перетворюємо string в number інакше просто копіюємо
+            if(colNum===1) {num[i] = +rowsArray[i].cells[colNum].innerText;}
+            else num[i]=rowsArray[i].cells[colNum].innerHTML;
+        }
+        //  якщо 0, то відображ. початкове значення таблиці
+        if(k===0)  { rowsArray = arr; }
+        //  якщо 1 сортуємо за зростаням
+        else if(k===1) {num.sort(); rowsArray= Doriv(rowsArray, num, colNum);}
+        //  інакше - за спаданням
+        else {num.reverse(); rowsArray= Doriv(rowsArray, num, colNum); }
+
+        // відображаємо змінений стовбець
+        gr.removeChild(tb);
+        for (let i = 0; i < rowsArray.length; i++) {
+            tb.appendChild(rowsArray[i]);
+        }
+        gr.appendChild(tb);
+    }
+    function makeClone(obj) {
+        let clone = [];
+        for (let prop in obj) { // Перебір усіх значень об*єкту
+            if (obj.hasOwnProperty(prop)) {
+                if ("object"===typeof obj[prop]) // Якщо теж об*єкт
+                    clone[prop] = makeClone(obj[prop]); // Рекурсія
+                else
+                    clone[prop] = obj[prop]; // Чи просто копіюємо значення
+            }
+        }
+        return clone;
+    }
+    // функція для копіювання змісту одного стовбця таблиці в окремий масив для зручнішого сортування
+    function Doriv(r, n, col) {
+        for (let i = 0; i < r.length; i++) {
+            r[i].cells[col].innerHTML = n[i];
+        }
+        return r;
+    }
+
+</script>
+</html>
